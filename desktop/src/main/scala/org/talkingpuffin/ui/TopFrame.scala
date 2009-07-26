@@ -1,12 +1,12 @@
 package org.talkingpuffin.ui
 import _root_.scala.swing.event.{ButtonClicked, WindowClosing}
 import filter.{FilterSet, TextFilter, TagUsers}
-import java.awt.event.{ActionEvent, ActionListener, KeyEvent}
-import java.awt.{Toolkit, Dimension, BorderLayout, Insets}
+import java.awt.{Dimension, PopupMenu, TrayIcon}
+import java.awt.event._
 import java.util.concurrent.{Callable, Executors, Executor}
 import java.util.prefs.Preferences
-import javax.swing._
 import javax.swing.border.{BevelBorder, EmptyBorder}
+import javax.swing.{SwingWorker, JPopupMenu, ImageIcon}
 import org.apache.log4j.Logger
 import org.talkingpuffin.mac.QuitHandler
 import scala.swing._
@@ -19,6 +19,7 @@ import twitter._
 import ui._
 import ui.util.FetchRequest
 
+
 /**
  * The top-level application Swing frame window. There is one per user session.
  */
@@ -29,6 +30,7 @@ class TopFrame(username: String, password: String, twitterSession: Authenticated
   val session = new Session(twitterSession)
   Globals.sessions ::= session
   iconImage = new ImageIcon(getClass.getResource("/TalkingPuffin.png")).getImage
+  val sysIcon = createSystemIcon
     
   val tabbedPane = new TabbedPane() {
     preferredSize = new Dimension(900, 600)
@@ -42,7 +44,7 @@ class TopFrame(username: String, password: String, twitterSession: Authenticated
   mainToolBar.init(streams)
     
   title = Main.title + " - " + username
-  menuBar = new MainMenuBar
+  menuBar = new MainMenuBar(destroy)
 
   contents = new GridBagPanel {
     val userPic = new Label
@@ -63,9 +65,7 @@ class TopFrame(username: String, password: String, twitterSession: Authenticated
 
   reactions += {
     case WindowClosing(_) => {
-      Globals.sessions = Globals.sessions remove(s => s == session)
-      saveState
-      TopFrames.removeFrame(this)
+      visible_=(false)
     }
   }
 
@@ -83,6 +83,12 @@ class TopFrame(username: String, password: String, twitterSession: Authenticated
     if (highMen.isDefined) prefs.put("highestMentionId", highMen.get.toString())
     tagUsers.save
     streams.streamInfoList.last.pane.saveState // TODO instead save the order of the last status pane changed
+  }
+
+  private def destroy {
+    Globals.sessions = Globals.sessions remove(s => s == session)
+    saveState
+    TopFrames.removeFrame(this)
   }
   
   private def createPeoplePane: Unit = {
@@ -114,5 +120,35 @@ class TopFrame(username: String, password: String, twitterSession: Authenticated
       }
     }.execute
   }
+
+  private def createSystemIcon {
+    if (java.awt.SystemTray.isSupported) {
+      val systray = java.awt.SystemTray.getSystemTray
+      val popup = new PopupMenu
+      val exit = new java.awt.MenuItem("Exit")
+      exit.addActionListener(new ActionListener {
+        def actionPerformed(e: ActionEvent) {
+          destroy
+        }
+      })
+      popup.add(exit)
+
+      val trayIcon = new TrayIcon(iconImage, "Talking Puffin", popup);
+      trayIcon.addMouseListener(new MouseAdapter {
+        override def mousePressed(e:MouseEvent) {
+          if (e.getButton == MouseEvent.BUTTON1)
+            visible_=(true)
+        }
+      })
+      trayIcon.setImageAutoSize(true)
+      systray.add(trayIcon)
+
+      return trayIcon
+    }
+    return Nil
+  }
+
+
+
 }
   

@@ -1,6 +1,7 @@
 package org.talkingpuffin.ui
 
 import apache.log4j.Logger
+import javax.swing.ImageIcon
 import mac.QuitHandler
 import talkingpuffin.util.Loggable
 
@@ -9,7 +10,6 @@ import talkingpuffin.util.Loggable
  */
 object TopFrames extends Loggable {
   private var frames = List[TopFrame]()
-
   QuitHandler register TopFrames.closeAll
 
   def addFrame(f: TopFrame){

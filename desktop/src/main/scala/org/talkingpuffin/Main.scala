@@ -1,23 +1,10 @@
 package org.talkingpuffin
 
-import _root_.scala.swing.event.{ButtonClicked, WindowClosing}
-import filter.{FilterSet, TextFilter}
-import java.awt.event.{ActionEvent, ActionListener, KeyEvent}
-import java.awt.{Toolkit, Dimension, BorderLayout, Insets}
-import java.util.prefs.Preferences
-import javax.swing.border.{BevelBorder, EmptyBorder}
-import javax.swing.{JToolBar, KeyStroke, ImageIcon, UIManager, JFrame}
+import javax.swing.{ImageIcon, UIManager, JFrame}
 import org.apache.log4j.Logger
-import org.talkingpuffin.mac.QuitHandler
 import scala.swing._
-import scala.xml._
-
-import TabbedPane._
-import state.PreferencesFactory
 import twitter._
 import ui._
-import ui.util.FetchRequest
-
 /**
  * TalkingPuffin main object
  */

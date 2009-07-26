@@ -10,7 +10,7 @@ import state.{GlobalPrefs, PrefKeys}
 /**
  * Main menu bar
  */
-class MainMenuBar extends MenuBar {
+class MainMenuBar(onQuit: => Unit) extends MenuBar {
   val prefs = GlobalPrefs.prefs
   
   contents += new Menu("Session") {
@@ -18,6 +18,11 @@ class MainMenuBar extends MenuBar {
       accelerator = Some(KeyStroke.getKeyStroke(KeyEvent.VK_N, 
         Toolkit.getDefaultToolkit.getMenuShortcutKeyMask))
       def apply = Main.launchSession 
+    })
+    contents += new MenuItem(new Action("Quit") {
+      accelerator = Some(KeyStroke.getKeyStroke(KeyEvent.VK_Q,
+        Toolkit.getDefaultToolkit.getMenuShortcutKeyMask))
+      def apply = onQuit
     })
   }
   contents += new Menu("Options") {
